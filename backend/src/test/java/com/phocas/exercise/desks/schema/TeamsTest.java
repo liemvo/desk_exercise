@@ -20,4 +20,19 @@ public class TeamsTest {
 		Assertions.assertEquals("A Team", aTeam.getName());
 		Assertions.assertNotNull(aTeam.getId());
 	}
+
+	@DeskTestDatabase
+	public void testUpdateTeam(VirtualDatabase database) {
+		var context = new ApiContext(database);
+		var aTeam = Team.putTeam(context, Optional.empty(), "A Team");
+
+		var newName = "A Team Updated";
+
+		Team.putTeam(context, Optional.of(aTeam.getId()), newName);
+
+		var teams = Team.teams(context);
+		Assertions.assertEquals(1, teams.size());
+		aTeam = teams.getFirst();
+		Assertions.assertEquals(newName, aTeam.getName());
+	}
 }

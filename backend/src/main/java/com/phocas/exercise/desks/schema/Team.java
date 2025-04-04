@@ -13,7 +13,7 @@ import com.phocas.exercise.desks.ApiContext;
 
 public class Team extends Table {
 
-	private final String name;
+	private String name;
 
 	@JsonCreator
 	public Team(String name) {
@@ -22,6 +22,10 @@ public class Team extends Table {
 
 	public String getName() {
 		return name;
+	}
+
+	private void setName(String name) {
+		this.name = name;
 	}
 
 	public List<Person> getMembers(ApiContext context) {
@@ -52,8 +56,22 @@ public class Team extends Table {
 
 	@Mutation
 	public static Team putTeam(ApiContext context, @Id Optional<String> id, String name) {
+		if (id.isPresent()) {
+			Team existingTeam = context.database().get(Team.class, id.get());
+			if (existingTeam != null) {
+				existingTeam.setName(name);
+				return context.database().put(existingTeam);
+			} else {
+				return insertNewTeam(context, name);
+			}
+		} else {
+			return insertNewTeam(context, name);
+		}
+	}
+
+	private static Team insertNewTeam(ApiContext context, String name) {
 		var team = new Team(name);
-		team.setId(id.orElse(context.database().newId()));
+		team.setId(context.database().newId());
 		return context.database().put(team);
 	}
 
