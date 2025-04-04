@@ -1,6 +1,6 @@
 import type { PeopleQuery } from './generated/graphql';
 import { DogStatus } from './generated/graphql';
-import { orderChecker } from "./orderChecker";
+import { orderChecker } from './orderChecker';
 
 type Person = PeopleQuery['people'][0];
 
@@ -29,7 +29,6 @@ type Person = PeopleQuery['people'][0];
  * This test suite may not be exhaustive for all edge cases.
  */
 export const calculateDeskLayout = (people: Person[]): Person[] => {
-
   if (!people || people.length === 0) {
     return [];
   }
@@ -38,7 +37,7 @@ export const calculateDeskLayout = (people: Person[]): Person[] => {
   const arrangedTeams: Person[][] = [];
 
   for (const person of people) {
-    const teamId = person.team?.id ?? "none";
+    const teamId = person.team?.id ?? 'none';
     if (!teams.has(teamId)) {
       teams.set(teamId, []);
       arrangedTeams.push([]);
@@ -106,11 +105,7 @@ const calculateOneTeam = (members: Person[]): Person[] => {
 
     for (let i = 0; i < hasDogs.length; i++) {
       const person = hasDogs[i];
-      const insertIndex = calculateInsertIndex(
-        result.length,
-        hasDogs.length,
-        i,
-      );
+      const insertIndex = calculateInsertIndex(result.length, hasDogs.length, i);
       result.splice(insertIndex, 0, person);
     }
 
@@ -118,7 +113,7 @@ const calculateOneTeam = (members: Person[]): Person[] => {
   }
 
   return arrangedPeople;
-}
+};
 
 const calculateInsertIndex = (
   resultLength: number,
