@@ -1,5 +1,5 @@
 import { MockedProvider } from '@apollo/client/testing';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { REMOVE_MEMBER, TEAM_QUERY } from '../queries/teams';
 import { mock } from '../testUtil';
@@ -25,7 +25,7 @@ const mocks = [
           members: [],
         },
       ],
-    }
+    },
   ),
   mock(
     REMOVE_MEMBER,
@@ -36,7 +36,7 @@ const mocks = [
         name: 'A team',
         members: [{ id: '102', name: 'Bob' }],
       },
-    }
+    },
   ),
 ];
 
@@ -45,7 +45,7 @@ describe('TeamsPage', () => {
     render(
       <MockedProvider mocks={mocks}>
         <TeamsPage />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     const names = await screen.findAllByTestId('name');
@@ -58,7 +58,7 @@ describe('TeamsPage', () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <TeamsPage />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     const memberChips = await screen.findAllByText(/Alice|Bob/);
@@ -66,8 +66,11 @@ describe('TeamsPage', () => {
 
     const aliceChip = screen.getByText('Alice');
     const parent = aliceChip.parentElement;
-    const deleteButton = parent!.querySelector('svg');
-    fireEvent.click(deleteButton!);
+    const deleteButton = parent?.querySelector('svg');
+
+    if (deleteButton) {
+      fireEvent.click(deleteButton);
+    }
 
     await waitFor(() => {
       expect(screen.queryByText('Alice')).not.toBeInTheDocument();

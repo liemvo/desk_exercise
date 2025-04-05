@@ -85,7 +85,7 @@ export default function TeamsPage() {
         if (!existingData || !existingData.teams) return;
 
         const updatedTeams = existingData.teams.map((team) =>
-          team.id === updatedTeam.id ? updatedTeam : team
+          team.id === updatedTeam.id ? updatedTeam : team,
         );
 
         cache.writeQuery({
@@ -124,7 +124,7 @@ export default function TeamsPage() {
                       <Chip
                         key={member.id}
                         label={member.name}
-                        color="primary"
+                        color='primary'
                         onDelete={() => handleDeleteMember(team.id, member.id)}
                       />
                     ))}
