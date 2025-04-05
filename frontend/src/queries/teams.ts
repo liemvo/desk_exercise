@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client';
 import { graphql } from '../generated';
 
 export const TEAM_QUERY = graphql(`
@@ -25,3 +26,16 @@ export const PUT_TEAM = graphql(`
     }
   }
   `);
+
+export const REMOVE_MEMBER = gql`
+  mutation removeMember($teamId: ID!, $memberId: ID!) {
+    removeMember(teamId: $teamId, memberId: $memberId) {
+      id
+      name
+      members {
+        id
+        name
+      }
+    }
+  }
+  `;

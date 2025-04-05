@@ -14,13 +14,14 @@ import {
   TextField,
 } from '@mui/material';
 import { useState } from 'react';
-import { PUT_TEAM, TEAM_QUERY } from '../queries/teams';
+import { PUT_TEAM, REMOVE_MEMBER, TEAM_QUERY } from '../queries/teams';
 
 export default function TeamsPage() {
   const [newTeam, setNewTeam] = useState<string>('');
   const client = useApolloClient();
 
   const { loading, error, data } = useQuery(TEAM_QUERY);
+  const [removeMember] = useMutation(REMOVE_MEMBER);
   const [putTeam] = useMutation(PUT_TEAM, {
     update(cache, { data }, { variables }) {
       let teams = cache.readQuery({ query: TEAM_QUERY })?.teams;
@@ -71,6 +72,30 @@ export default function TeamsPage() {
     }
   };
 
+  const handleDeleteMember = async (teamId: string, memberId: string) => {
+    await removeMember({
+      variables: { teamId, memberId },
+      update(cache, { data }) {
+        if (!data) return;
+
+        const updatedTeam = data.removeMember;
+        if (!updatedTeam) return;
+
+        const existingData = cache.readQuery({ query: TEAM_QUERY });
+        if (!existingData || !existingData.teams) return;
+
+        const updatedTeams = existingData.teams.map((team) =>
+          team.id === updatedTeam.id ? updatedTeam : team
+        );
+
+        cache.writeQuery({
+          query: TEAM_QUERY,
+          data: { teams: updatedTeams },
+        });
+      },
+    });
+  };
+
   return (
     <div>
       <TableContainer>
@@ -96,7 +121,12 @@ export default function TeamsPage() {
                 <TableCell>
                   <Stack spacing={1} direction='row'>
                     {team.members.map((member) => (
-                      <Chip key={member.id} label={member.name} color='primary' />
+                      <Chip
+                        key={member.id}
+                        label={member.name}
+                        color="primary"
+                        onDelete={() => handleDeleteMember(team.id, member.id)}
+                      />
                     ))}
                   </Stack>
                 </TableCell>

@@ -75,4 +75,15 @@ public class Team extends Table {
 		return context.database().put(team);
 	}
 
+	@Mutation
+	public static Team removeMember(ApiContext context, @Id String teamId, @Id String memberId) {
+		var member = context.database().get(Person.class, memberId);
+		if (member != null && member.getTeam(context).get().getId().equals(teamId)) {
+			Person.setTeam(context, memberId, null);
+			return context.database().get(Team.class, teamId);
+		}
+
+		return null;
+	}
+
 }

@@ -35,4 +35,20 @@ public class TeamsTest {
 		aTeam = teams.getFirst();
 		Assertions.assertEquals(newName, aTeam.getName());
 	}
+
+	@DeskTestDatabase
+	public void testRemoveMember(VirtualDatabase database) {
+		ApiContext context = new ApiContext(database);
+		Team team = Team.putTeam(context, Optional.empty(), "A Team");
+		Person person = Person.putPerson(context, Optional.empty(), "James", Person.DogStatus.HAVE);
+		var updatedPerson = Person.setTeam(context, person.getId(), team.getId());
+
+		Assertions.assertEquals(team.getId(), updatedPerson.getTeam(context).orElse(null).getId());
+
+		var updatedTeam = Team.removeMember(context, team.getId(), person.getId());
+
+		updatedPerson = context.database().get(Person.class, person.getId());
+		Assertions.assertNull(updatedPerson.getTeam(context).orElse(null));
+		Assertions.assertEquals(0, updatedTeam.getMembers(context).size());
+	}
 }
